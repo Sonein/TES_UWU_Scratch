@@ -1,0 +1,71 @@
+:root {
+
+  /* color palette */
+  --pink-bg: #f6b6c6;
+  --pink-panel: #ffd6df;
+  --pink-border: #c86b8b;
+
+}
+
+body {
+  margin: 0;
+  background: var(--pink-bg);
+  font-family: sans-serif;
+  height: 100vh;
+}
+
+#app {
+  height: 100vh;
+
+  display: grid;
+
+  grid-template-columns: 180fr 420fr;
+  grid-template-rows: 70px 70px 1fr;
+
+  grid-template-areas:
+    "toolbar toolbar"
+    "inspector inspector"
+    "blocks stage";
+
+  gap: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.panel {
+  background: var(--pink-panel);
+  border: 4px solid var(--pink-border);
+  border-radius: 0; /* squared */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+
+#toolbar {
+  grid-area: toolbar;
+}
+
+#inspector {
+  grid-area: inspector;
+}
+
+#block-panel {
+  grid-area: blocks;
+  height: 100%;
+  overflow: hidden;
+}
+
+#block-panel > div {
+  height: 100%;
+}
+
+#stage {
+  grid-area: stage;
+  padding: 10px;
+}
+
+#stage-inner {
+  width: 100%;
+  height: 90%;
+  background: white;
+}
