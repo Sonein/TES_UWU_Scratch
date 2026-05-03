@@ -30,6 +30,16 @@ export class BlocklyWorkspace {
 
                 {
                     kind: "block",
+                    type: "start_clicked"
+                },
+
+                {
+                    kind: "block",
+                    type: "start_key_pressed"
+                },
+
+                {
+                    kind: "block",
                     type: "move_forward",
                     inputs: {
                         STEPS: {
@@ -49,6 +59,11 @@ export class BlocklyWorkspace {
                 {
                     kind: "block",
                     type: "always_true"
+                },
+
+                {
+                    kind: "block",
+                    type: "always_false"
                 },
 
                 {
@@ -136,6 +151,29 @@ export class BlocklyWorkspace {
                 {
                     kind: "block",
                     type: "while"
+                },
+
+                {
+                    kind: "block",
+                    type: "jump_to_mouse_select"
+                },
+
+                {
+                    kind: "block",
+                    type: "glide_to_mouse_select",
+                    inputs: {
+                        TIME: { block: { type: "math_number", fields: { NUM: 0 } } }
+                    }
+                },
+
+                {
+                    kind: "block",
+                    type: "set_costume"
+                },
+
+                {
+                    kind: "block",
+                    type: "set_bounce"
                 }
 
             ]

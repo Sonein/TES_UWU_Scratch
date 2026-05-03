@@ -1,15 +1,11 @@
 import * as Blockly from "blockly"
 import { FieldAngle } from "@blockly/field-angle";
 import "blockly/blocks";
+import { FieldRectPicker } from "./FieldRectPicker";
+import { FieldCostumePicker } from "./FieldCostumePicker";
 
 //@TODO change colors
 /*@TODO blocks
-jump to mouse
-glide to mouse
-bounce from edge
-change costume to choice
-start on key
-start on click
 if (reached edge, mouse hover, touch other sprite by name)
 if else
  */
@@ -170,10 +166,10 @@ export function registerBlocks() {
         init: function () {
             this.appendValueInput("TIMES")
                 .setCheck("Number")
-                .appendField("repeat");
+                .appendField("Opakuj");
 
             this.appendStatementInput("DO")
-                .appendField("do");
+                .appendField("rob");
 
             this.setPreviousStatement(true);
             this.setNextStatement(true);
@@ -185,10 +181,10 @@ export function registerBlocks() {
         init: function () {
             this.appendValueInput("COND")
                 .setCheck("Boolean")
-                .appendField("while");
+                .appendField("kym");
 
             this.appendStatementInput("DO")
-                .appendField("do");
+                .appendField("rob");
 
             this.setPreviousStatement(true);
             this.setNextStatement(true);
@@ -199,10 +195,120 @@ export function registerBlocks() {
     Blockly.Blocks["always_true"] = {
         init: function () {
             this.appendDummyInput()
-                .appendField("true");
+                .appendField("pravda");
 
             this.setOutput(true, "Boolean");
             this.setColour(210);
+        }
+    };
+
+    Blockly.Blocks["always_false"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("nepravda");
+
+            this.setOutput(false, "Boolean");
+            this.setColour(210);
+        }
+    };
+
+    Blockly.Blocks["jump_to_mouse_select"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("Skoc na bod v:")
+                .appendField(
+                    new FieldRectPicker(JSON.stringify({
+                        x1: 50,
+                        y1: 50,
+                        x2: 200,
+                        y2: 200
+                    })),
+                    "RECT"
+                );
+
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setColour(320);
+        }
+    };
+
+    Blockly.Blocks["glide_to_mouse_select"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("Prejdi na bod v:")
+                .appendField(
+                    new FieldRectPicker(JSON.stringify({
+                        x1: 50,
+                        y1: 50,
+                        x2: 200,
+                        y2: 200
+                    })),
+                    "RECT"
+                );
+
+            this.appendValueInput("TIME")
+                .setCheck("Number")
+                .appendField("za sekund");
+
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setColour(320);
+        }
+    };
+
+    Blockly.Blocks["set_costume"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("set costume")
+                .appendField(new FieldCostumePicker("0"), "COSTUME");
+
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setColour(300);
+        }
+    };
+
+    Blockly.Blocks["start_clicked"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("Zacni ked kliknem :3");
+
+            this.setNextStatement(true);
+            this.setColour(57);
+        }
+    };
+
+    Blockly.Blocks["start_key_pressed"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("Zacni ked stlacim:")
+                .appendField(new Blockly.FieldDropdown([
+                    ["space", "Space"],
+                    ["arrow up", "ArrowUp"],
+                    ["arrow down", "ArrowDown"],
+                    ["arrow left", "ArrowLeft"],
+                    ["arrow right", "ArrowRight"],
+                    ["w", "KeyW"],
+                    ["a", "KeyA"],
+                    ["s", "KeyS"],
+                    ["d", "KeyD"],
+                    ["enter", "Enter"]
+                ]), "KEY");
+
+            this.setNextStatement(true);
+            this.setColour(57);
+        }
+    };
+
+    Blockly.Blocks["set_bounce"] = {
+        init: function () {
+            this.appendValueInput("VALUE")
+                .setCheck("Boolean")
+                .appendField("Odraz sa od kraja");
+
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setColour(320);
         }
     };
 
