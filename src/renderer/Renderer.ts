@@ -70,7 +70,17 @@ export class Renderer {
     }
 
     private update() {
+        const width = this.app.renderer.width;
+        const height = this.app.renderer.height;
+
         for (const view of this.spriteViews.values()) {
+            const sprite = view.sprite;
+            const data = sprite.data;
+
+            if (data.bounceOnEdge) {
+                this.handleBounce(view, width, height);
+            }
+
             view.syncFromSprite();
         }
     }
@@ -105,4 +115,41 @@ export class Renderer {
         }
 
     }
+
+    private handleBounce(view: SpriteView, stageWidth: number, stageHeight: number) {
+        const sprite = view.sprite;
+        const data = sprite.data;
+
+        const radius = view.getCollisionRadius();
+        const { vx, vy } = sprite.getVelocity();
+        const sx = vx > 0 ? 1 : -1;
+        const sy = vy > 0 ? 1 : -1;
+
+        let x = data.x;
+        let y = data.y;
+        let rotation = data.rotation;
+
+        if (x - radius < 0) {
+            x = radius + vx;
+            rotation = rotation + 90 * sy;
+        } else if (x + radius > stageWidth) {
+            x = stageWidth - radius - vx;
+            rotation = rotation + 90 * sy;
+        }
+
+        if (y - radius < 0) {
+            y = radius + vy;
+            rotation = rotation + 90 * (-sx);
+        } else if (y + radius > stageHeight) {
+            y = stageHeight - radius - vy;
+            rotation = rotation + 90 * (-sx);
+        }
+
+        sprite.setPosition(x, y);
+        sprite.setRotation(normalizeAngle(rotation));
+    }
+}
+
+function normalizeAngle(angle: number): number {
+    return ((angle % 360) + 360) % 360;
 }
