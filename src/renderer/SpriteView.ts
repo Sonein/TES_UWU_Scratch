@@ -118,4 +118,13 @@ export class SpriteView {
 
     }
 
+    getCollisionRadius(): number {
+        const texture = this.pixiSprite.texture;
+
+        const w = texture.width * this.sprite.data.scale;
+        const h = texture.height * this.sprite.data.scale;
+
+        return Math.max(w, h) / 2;
+    }
+
 }
