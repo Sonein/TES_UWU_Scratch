@@ -1,8 +1,8 @@
 import type {Sprite} from "../core/Sprite.ts";
 import * as Blockly from "blockly";
-import { ExecutionController } from "../scripting/ExecutionController.ts";
+import {ExecutionController} from "../scripting/ExecutionController.ts";
 
-export async function runProgram(sprite: Sprite, controller: ExecutionController) {
+export async function runProgram(sprite: Sprite, controller: ExecutionController, starterType = "start", eventData?: any) {
     const program = sprite.data.program;
     if (!program) return;
     const workspace = new Blockly.Workspace();
@@ -13,10 +13,17 @@ export async function runProgram(sprite: Sprite, controller: ExecutionController
     for (const block of blocks) {
         controller.throwIfStopped();
 
-        if (block.type === "start") {
-            await executeChain(block, sprite, controller);
+        if (block.type !== starterType) continue;
+
+        if (starterType === "start_key_pressed") {
+            const wantedKey = block.getFieldValue("KEY");
+            if (wantedKey !== eventData?.keyCode) continue;
         }
+
+        await executeChain(block, sprite, controller);
     }
+
+    workspace.dispose();
 }
 
 async function executeChain(block: Blockly.Block, sprite: Sprite, controller: ExecutionController) {
@@ -150,6 +157,50 @@ async function executeBlock(block: Blockly.Block, sprite: Sprite, controller: Ex
             break;
         }
 
+        case "jump_to_mouse_select": {
+            const rect = getRectField(block, "RECT");
+            const point = randomInRect(rect);
+
+            sprite.setPosition(point.x, point.y);
+            break;
+        }
+
+        case "glide_to_mouse_select": {
+            const rect = getRectField(block, "RECT");
+            const point = randomInRect(rect);
+
+            const duration = getNumberInput(block, "TIME") * 1000;
+
+            await glideTo(
+                sprite,
+                point.x,
+                point.y,
+                duration,
+                controller
+            );
+
+            break;
+        }
+
+        case "set_costume": {
+            const index = Number(block.getFieldValue("COSTUME"));
+
+            if (
+                Number.isInteger(index) &&
+                index >= 0 &&
+                index < sprite.data.costumes.length
+            ) {
+                sprite.data.currentCostume = index;
+            }
+
+            break;
+        }
+
+        case "set_bounce": {
+            sprite.data.bounceOnEdge = getBooleanInput(block, "VALUE");
+            break;
+        }
+
     }
 
 }
@@ -223,14 +274,45 @@ function sleep(ms: number, controller: ExecutionController): Promise<void> {
 }
 
 function getBooleanInput(block: Blockly.Block, name: string): boolean {
-
     const input = block.getInputTargetBlock(name);
     if (!input) return false;
 
     switch (input.type) {
         case "always_true":
             return true;
+        case "always_false":
+            return false;
         default:
             return false;
     }
+}
+
+function getRectField(block: Blockly.Block, name: string) {
+    const raw = block.getFieldValue(name);
+
+    const rect = JSON.parse(raw) as {
+        x1: number;
+        y1: number;
+        x2: number;
+        y2: number;
+    };
+
+    const minX = Math.min(rect.x1, rect.x2);
+    const maxX = Math.max(rect.x1, rect.x2);
+    const minY = Math.min(rect.y1, rect.y2);
+    const maxY = Math.max(rect.y1, rect.y2);
+
+    return { minX, maxX, minY, maxY };
+}
+
+function randomInRect(rect: {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+}) {
+    return {
+        x: rect.minX + Math.random() * (rect.maxX - rect.minX),
+        y: rect.minY + Math.random() * (rect.maxY - rect.minY)
+    };
 }
