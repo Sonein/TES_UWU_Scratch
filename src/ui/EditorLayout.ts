@@ -9,6 +9,8 @@ import { BlocklyWorkspace } from "../blocks/BlocklyWorkspace";
 import { registerBlocks } from "../blocks/blockDefinitions";
 import { runProgram } from "../blocks/blockExecution.ts";
 import { ExecutionController } from "../scripting/ExecutionController.ts";
+import { FieldRectPicker } from "../blocks/FieldRectPicker";
+import { FieldCostumePicker } from "../blocks/FieldCostumePicker";
 
 export class EditorLayout {
 
@@ -44,6 +46,8 @@ export class EditorLayout {
         this.toolbar = toolbar;
         this.blockPanel = blockPanel;
         this.stage = stage;
+
+        FieldRectPicker.configure(this.stage);
     }
 
     async initialize() {
@@ -85,6 +89,9 @@ export class EditorLayout {
         registerBlocks();
         this.blockly = new BlocklyWorkspace(this.blockPanel);
         this.blockly.initialize();
+        FieldCostumePicker.configure(() => this.runtime.getSelectedSprite());
+
+        this.setupKeyboardEvents();
 
         console.log("Renderer initialized");
     }
@@ -138,6 +145,12 @@ export class EditorLayout {
         loadBtn.onclick = () => this.loadProject();
         this.toolbar.appendChild(loadBtn);
 
+        //clear trash
+        const clearTrashBtn = this.registerToolbarButton(document.createElement("button"));
+        clearTrashBtn.textContent = "Empty Trash";
+        clearTrashBtn.onclick = () => this.clearTrashcan();
+        this.toolbar.appendChild(clearTrashBtn);
+
         //run
         this.runButton = document.createElement("button");
         this.runButton.textContent = "Run";
@@ -154,6 +167,7 @@ export class EditorLayout {
 
     private async onSpriteClicked(sprite: Sprite) {
         if (this.activeTool === EditorTool.RUNNING) {
+            await this.runSingleSpriteEvent(sprite, "start_clicked");
             return;
         }
 
@@ -175,7 +189,8 @@ export class EditorLayout {
                 visible: data.visible,
                 costumes: structuredClone(data.costumes),
                 currentCostume: data.currentCostume,
-                program: structuredClone(data.program)
+                program: structuredClone(data.program),
+                bounceOnEdge: data.bounceOnEdge
             });
 
             await this.renderer.addSprite(
@@ -215,6 +230,26 @@ export class EditorLayout {
         this.updateInspectorVisibility();
     }
 
+    private setupKeyboardEvents() {
+        window.addEventListener("keydown", async (event) => {
+            if (this.activeTool !== EditorTool.RUNNING) {
+                return;
+            }
+
+            if (!this.executionController) {
+                return;
+            }
+
+            const promises = this.runtime.getAllSprites().map(sprite =>
+                runProgram(sprite, this.executionController!, "start_key_pressed", {
+                    keyCode: event.code
+                })
+            );
+
+            await Promise.all(promises);
+        });
+    }
+
     private async importSprite() {
         const input = document.createElement("input");
         input.type = "file";
@@ -239,7 +274,8 @@ export class EditorLayout {
                         name: file.name,
                         image: imageData
                     }],
-                    currentCostume: 0
+                    currentCostume: 0,
+                    bounceOnEdge: false
                 });
 
                 await this.renderer.addSprite(sprite,
@@ -292,6 +328,12 @@ export class EditorLayout {
         if (this.stopButton) {
             this.stopButton.disabled = !locked;
         }
+    }
+
+    private async runSingleSpriteEvent(sprite: Sprite, starterType: string, eventData?: any) {
+        if (!this.executionController) return;
+
+        await runProgram(sprite, this.executionController, starterType, eventData);
     }
 
     private changeBackground() {
@@ -436,5 +478,11 @@ export class EditorLayout {
             this.updateToolbarStyles();
             this.updateInspectorVisibility();
         }
+    }
+
+    private clearTrashcan() {
+        const trash = this.blockly.workspace.trashcan;
+        if (!trash) return;
+        trash.emptyContents()
     }
 }
