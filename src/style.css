@@ -19,7 +19,7 @@ body {
 
   display: grid;
 
-  grid-template-columns: 180fr 420fr;
+  grid-template-columns: 40fr 60fr;
   grid-template-rows: 70px 70px 1fr;
 
   grid-template-areas:
