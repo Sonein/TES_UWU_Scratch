@@ -11,6 +11,8 @@ import { runProgram } from "../blocks/blockExecution.ts";
 import { ExecutionController } from "../scripting/ExecutionController.ts";
 import { FieldRectPicker } from "../blocks/FieldRectPicker";
 import { FieldCostumePicker } from "../blocks/FieldCostumePicker";
+import { FieldSpriteDropdown } from "../blocks/FieldSpriteDropdown";
+import type {ExecutionEnvironment} from "../blocks/blockExecution.ts";
 
 export class EditorLayout {
 
@@ -32,6 +34,8 @@ export class EditorLayout {
     private currentProgramSprite: Sprite | null = null;
     private preExecutionProject: any | null = null;
     private executionController: ExecutionController | null = null;
+    private lastMouseX = 0;
+    private lastMouseY = 0;
 
     constructor() {
 
@@ -85,6 +89,8 @@ export class EditorLayout {
             );
         };
 
+        FieldSpriteDropdown.configure(() => this.runtime.getAllSprites());
+
         //await this.testObject();
         registerBlocks();
         this.blockly = new BlocklyWorkspace(this.blockPanel);
@@ -92,6 +98,11 @@ export class EditorLayout {
         FieldCostumePicker.configure(() => this.runtime.getSelectedSprite());
 
         this.setupKeyboardEvents();
+        this.stage.addEventListener("pointermove", (event) => {
+            const rect = this.stage.getBoundingClientRect();
+            this.lastMouseX = event.clientX - rect.left;
+            this.lastMouseY = event.clientY - rect.top;
+        });
 
         console.log("Renderer initialized");
     }
@@ -239,11 +250,11 @@ export class EditorLayout {
             if (!this.executionController) {
                 return;
             }
-
+            const environment = this.createExecutionEnvironment();
             const promises = this.runtime.getAllSprites().map(sprite =>
                 runProgram(sprite, this.executionController!, "start_key_pressed", {
                     keyCode: event.code
-                })
+                }, environment)
             );
 
             await Promise.all(promises);
@@ -332,8 +343,8 @@ export class EditorLayout {
 
     private async runSingleSpriteEvent(sprite: Sprite, starterType: string, eventData?: any) {
         if (!this.executionController) return;
-
-        await runProgram(sprite, this.executionController, starterType, eventData);
+        const environment = this.createExecutionEnvironment();
+        await runProgram(sprite, this.executionController, starterType, eventData, environment);
     }
 
     private changeBackground() {
@@ -460,11 +471,12 @@ export class EditorLayout {
         this.updateToolbarStyles();
         this.updateInspectorVisibility();
 
-        this.saveProject("temp.json")
+        this.saveProject("temp.json");
 
         try {
+            const environment = this.createExecutionEnvironment();
             const promises = this.runtime.getAllSprites().map(sprite =>
-                runProgram(sprite, this.executionController!)
+                runProgram(sprite, this.executionController!, "start", undefined, environment)
             );
 
             await Promise.all(promises);
@@ -484,5 +496,20 @@ export class EditorLayout {
         const trash = this.blockly.workspace.trashcan;
         if (!trash) return;
         trash.emptyContents()
+    }
+
+    private createExecutionEnvironment(): ExecutionEnvironment {
+        return {
+            stageWidth: this.stage.clientWidth,
+            stageHeight: this.stage.clientHeight,
+            mouseX: this.lastMouseX,
+            mouseY: this.lastMouseY,
+
+            getSpriteView: (spriteId: string) =>
+                this.renderer.getSpriteView(spriteId),
+
+            getAllSpriteViews: () =>
+                this.renderer.getAllSpriteViews()
+        };
     }
 }
