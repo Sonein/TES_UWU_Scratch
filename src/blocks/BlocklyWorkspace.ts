@@ -174,6 +174,16 @@ export class BlocklyWorkspace {
                 {
                     kind: "block",
                     type: "set_bounce"
+                },
+
+                {
+                    kind: "block",
+                    type: "if"
+                },
+
+                {
+                    kind: "block",
+                    type: "if_else"
                 }
 
             ]

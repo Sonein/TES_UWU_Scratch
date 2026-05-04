@@ -3,12 +3,9 @@ import { FieldAngle } from "@blockly/field-angle";
 import "blockly/blocks";
 import { FieldRectPicker } from "./FieldRectPicker";
 import { FieldCostumePicker } from "./FieldCostumePicker";
+import { FieldSpriteDropdown } from "./FieldSpriteDropdown";
 
 //@TODO change colors
-/*@TODO blocks
-if (reached edge, mouse hover, touch other sprite by name)
-if else
- */
 export function registerBlocks() {
 
     Blockly.Blocks["start"] = {
@@ -207,7 +204,7 @@ export function registerBlocks() {
             this.appendDummyInput()
                 .appendField("nepravda");
 
-            this.setOutput(false, "Boolean");
+            this.setOutput(true, "Boolean");
             this.setColour(210);
         }
     };
@@ -309,6 +306,51 @@ export function registerBlocks() {
             this.setPreviousStatement(true);
             this.setNextStatement(true);
             this.setColour(320);
+        }
+    };
+
+    Blockly.Blocks["if"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("Ak")
+                .appendField(new Blockly.FieldDropdown([
+                    ["...mys na", "HOVERED"],
+                    ["...na okraji", "EDGE"],
+                    ["...narazil na inu", "SPRITE"]
+                ]), "CONDITION")
+                .appendField("ciel")
+                .appendField(new FieldSpriteDropdown(), "TARGET");
+
+            this.appendStatementInput("DO")
+                .appendField("Rob");
+
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setColour(340);
+        }
+    };
+
+    Blockly.Blocks["if_else"] = {
+        init: function () {
+            this.appendDummyInput()
+                .appendField("Ak")
+                .appendField(new Blockly.FieldDropdown([
+                    ["...mys na", "HOVERED"],
+                    ["...na okraji", "EDGE"],
+                    ["...narazil na inu", "SPRITE"]
+                ]), "CONDITION")
+                .appendField("ciel")
+                .appendField(new FieldSpriteDropdown(), "TARGET");
+
+            this.appendStatementInput("DO")
+                .appendField("Rob");
+
+            this.appendStatementInput("ELSE")
+                .appendField("Inak");
+
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setColour(340);
         }
     };
 
