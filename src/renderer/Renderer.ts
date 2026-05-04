@@ -63,6 +63,10 @@ export class Renderer {
         return this.spriteViews.get(spriteId);
     }
 
+    getAllSpriteViews(): SpriteView[] {
+        return Array.from(this.spriteViews.values());
+    }
+
     syncSprite(sprite: Sprite) {
         const view = this.spriteViews.get(sprite.data.id);
         if (!view) return;
@@ -122,32 +126,49 @@ export class Renderer {
 
         const radius = view.getCollisionRadius();
         const { vx, vy } = sprite.getVelocity();
-        const sx = vx > 0 ? 1 : -1;
-        const sy = vy > 0 ? 1 : -1;
+
+        if (vx === 0 && vy === 0) return;
 
         let x = data.x;
         let y = data.y;
-        let rotation = data.rotation;
+
+        let newVx = vx;
+        let newVy = vy;
+
+        let bounced = false;
 
         if (x - radius < 0) {
-            x = radius + vx;
-            rotation = rotation + 90 * sy;
+            x = radius;
+            newVx = Math.abs(vx);      // bounce right
+            bounced = true;
         } else if (x + radius > stageWidth) {
-            x = stageWidth - radius - vx;
-            rotation = rotation + 90 * sy;
+            x = stageWidth - radius;
+            newVx = -Math.abs(vx);     // bounce left
+            bounced = true;
         }
 
         if (y - radius < 0) {
-            y = radius + vy;
-            rotation = rotation + 90 * (-sx);
+            y = radius;
+            newVy = Math.abs(vy);      // bounce down
+            bounced = true;
         } else if (y + radius > stageHeight) {
-            y = stageHeight - radius - vy;
-            rotation = rotation + 90 * (-sx);
+            y = stageHeight - radius;
+            newVy = -Math.abs(vy);     // bounce up
+            bounced = true;
         }
 
+        if (!bounced) return;
+
         sprite.setPosition(x, y);
-        sprite.setRotation(normalizeAngle(rotation));
+        sprite.setRotation(vectorToAngle(newVx, newVy));
     }
+}
+
+function vectorToAngle(vx: number, vy: number): number {
+    const radians = Math.atan2(vx, -vy);
+    const degrees = radians * 180 / Math.PI;
+
+    return normalizeAngle(degrees);
 }
 
 function normalizeAngle(angle: number): number {

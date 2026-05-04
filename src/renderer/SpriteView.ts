@@ -127,4 +127,33 @@ export class SpriteView {
         return Math.max(w, h) / 2;
     }
 
+    containsPoint(x: number, y: number): boolean {
+        const dx = x - this.sprite.data.x;
+        const dy = y - this.sprite.data.y;
+        const r = this.getCollisionRadius();
+
+        return dx * dx + dy * dy <= r * r;
+    }
+
+    collidesWith(other: SpriteView): boolean {
+        const dx = this.sprite.data.x - other.sprite.data.x;
+        const dy = this.sprite.data.y - other.sprite.data.y;
+
+        const r = this.getCollisionRadius() + other.getCollisionRadius();
+
+        return dx * dx + dy * dy <= r * r;
+    }
+
+    touchesStageEdge(stageWidth: number, stageHeight: number): boolean {
+        const r = this.getCollisionRadius();
+        const data = this.sprite.data;
+
+        return (
+            data.x - r <= 0 ||
+            data.x + r >= stageWidth ||
+            data.y - r <= 0 ||
+            data.y + r >= stageHeight
+        );
+    }
+
 }
