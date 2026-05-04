@@ -1,11 +1,26 @@
 import type {Sprite} from "../core/Sprite.ts";
 import * as Blockly from "blockly";
 import {ExecutionController} from "../scripting/ExecutionController.ts";
+import {SpriteView} from "../renderer/SpriteView.ts";
 
-export async function runProgram(sprite: Sprite, controller: ExecutionController, starterType = "start", eventData?: any) {
+export type ExecutionEnvironment = {
+    stageWidth: number;
+    stageHeight: number;
+    mouseX: number;
+    mouseY: number;
+
+    getSpriteView(spriteId: string): SpriteView | undefined;
+    getAllSpriteViews(): SpriteView[];
+};
+
+export async function runProgram(sprite: Sprite, controller: ExecutionController, starterType = "start", eventData?: any, environment?: ExecutionEnvironment) {
     const program = sprite.data.program;
     if (!program) return;
+    if (!environment) {
+        throw new Error("ExecutionEnvironment is required");
+    }
     const workspace = new Blockly.Workspace();
+    console.log(environment);
 
     Blockly.serialization.workspaces.load(program, workspace);
     const blocks = workspace.getTopBlocks(true);
@@ -20,35 +35,35 @@ export async function runProgram(sprite: Sprite, controller: ExecutionController
             if (wantedKey !== eventData?.keyCode) continue;
         }
 
-        await executeChain(block, sprite, controller);
+        await executeChain(block, sprite, controller, environment);
     }
 
     workspace.dispose();
 }
 
-async function executeChain(block: Blockly.Block, sprite: Sprite, controller: ExecutionController) {
+async function executeChain(block: Blockly.Block, sprite: Sprite, controller: ExecutionController, environment: ExecutionEnvironment) {
     let current: Blockly.Block | null = block;
 
     while (current) {
         controller.throwIfStopped();
-        await executeBlock(current, sprite, controller);
+        await executeBlock(current, sprite, controller, environment);
         current = current.getNextBlock();
     }
 }
 
-async function executeSubChain(block: Blockly.Block | null, sprite: Sprite, controller: ExecutionController) {
+async function executeSubChain(block: Blockly.Block | null, sprite: Sprite, controller: ExecutionController, environment: ExecutionEnvironment) {
 
     let current = block;
 
     while (current) {
         controller.throwIfStopped();
-        await executeBlock(current, sprite, controller);
+        await executeBlock(current, sprite, controller, environment);
         current = current.getNextBlock();
     }
 
 }
 
-async function executeBlock(block: Blockly.Block, sprite: Sprite, controller: ExecutionController) {
+async function executeBlock(block: Blockly.Block, sprite: Sprite, controller: ExecutionController, environment: ExecutionEnvironment) {
     switch (block.type) {
         case "move_forward": {
             const steps = getNumberInput(block, "STEPS");
@@ -133,7 +148,7 @@ async function executeBlock(block: Blockly.Block, sprite: Sprite, controller: Ex
             for (let i = 0; i < times; i++) {
                 controller.throwIfStopped();
                 if (body) {
-                    await executeSubChain(body, sprite, controller);
+                    await executeSubChain(body, sprite, controller, environment);
                 }
             }
 
@@ -150,7 +165,7 @@ async function executeBlock(block: Blockly.Block, sprite: Sprite, controller: Ex
                 controller.throwIfStopped();
                 if (iterations++ > MAX) break;
                 if (body) {
-                    await executeSubChain(body, sprite, controller);
+                    await executeSubChain(body, sprite, controller, environment);
                 }
             }
 
@@ -198,6 +213,40 @@ async function executeBlock(block: Blockly.Block, sprite: Sprite, controller: Ex
 
         case "set_bounce": {
             sprite.data.bounceOnEdge = getBooleanInput(block, "VALUE");
+            break;
+        }
+
+        case "if": {
+            console.log(evaluateCondition(block, sprite, environment))
+            if (evaluateCondition(block, sprite, environment)) {
+                await executeSubChain(
+                    block.getInputTargetBlock("DO"),
+                    sprite,
+                    controller,
+                    environment
+                );
+            }
+
+            break;
+        }
+
+        case "if_else": {
+            if (evaluateCondition(block, sprite, environment)) {
+                await executeSubChain(
+                    block.getInputTargetBlock("DO"),
+                    sprite,
+                    controller,
+                    environment
+                );
+            } else {
+                await executeSubChain(
+                    block.getInputTargetBlock("ELSE"),
+                    sprite,
+                    controller,
+                    environment
+                );
+            }
+
             break;
         }
 
@@ -315,4 +364,39 @@ function randomInRect(rect: {
         x: rect.minX + Math.random() * (rect.maxX - rect.minX),
         y: rect.minY + Math.random() * (rect.maxY - rect.minY)
     };
+}
+
+function evaluateCondition(
+    block: Blockly.Block,
+    sprite: Sprite,
+    env?: ExecutionEnvironment
+): boolean {
+    if (!env) return false;
+
+    const view = env.getSpriteView(sprite.data.id);
+    if (!view) return false;
+
+    const condition = block.getFieldValue("CONDITION");
+
+    switch (condition) {
+        case "HOVERED":
+            return view.containsPoint(env.mouseX, env.mouseY);
+
+        case "EDGE":
+            return view.touchesStageEdge(env.stageWidth, env.stageHeight);
+
+        case "SPRITE": {
+            const targetId = block.getFieldValue("TARGET");
+            const targetView = env.getSpriteView(targetId);
+
+            if (!targetView || targetId === sprite.data.id) {
+                return false;
+            }
+
+            return view.collidesWith(targetView);
+        }
+
+        default:
+            return false;
+    }
 }
