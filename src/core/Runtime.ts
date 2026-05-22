@@ -50,4 +50,12 @@ export class Runtime {
     clear(): void {
         this.sprites.clear();
     }
+
+    clearSelection() {
+        this.selectedSpriteId = null;
+
+        if (this.onSpriteSelected) {
+            this.onSpriteSelected(null);
+        }
+    }
 }
