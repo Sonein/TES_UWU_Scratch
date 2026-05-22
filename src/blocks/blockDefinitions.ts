@@ -5,7 +5,6 @@ import { FieldRectPicker } from "./FieldRectPicker";
 import { FieldCostumePicker } from "./FieldCostumePicker";
 import { FieldSpriteDropdown } from "./FieldSpriteDropdown";
 
-//@TODO change colors
 export function registerBlocks() {
 
     Blockly.Blocks["start"] = {
@@ -69,7 +68,18 @@ export function registerBlocks() {
         init: function () {
             this.appendDummyInput()
                 .appendField("Nech rotacia")
-                .appendField(new FieldAngle(90), "ANGLE")
+                .appendField(
+                    new FieldAngle(0, undefined, {
+                        clockwise: true,
+                        offset: 90,
+                        displayMin: 0,
+                        displayMax: 360,
+                        minorTick: 15,
+                        majorTick: 45,
+                        symbol: "°"
+                    }),
+                    "ANGLE"
+                )
                 .appendField("stupnov");
 
             this.setPreviousStatement(true);
