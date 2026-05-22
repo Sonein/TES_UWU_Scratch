@@ -30,6 +30,7 @@ export class CostumesManager {
         this.container.style.display = "none";
     }
 
+    //@TODO buttons
     render(): void {
         if (!this.sprite) return;
 
