@@ -18,174 +18,208 @@ export class BlocklyWorkspace {
         Blockly.svgResize(this.workspace);
     }
 
+    //@TODO make categories
     private createToolbox() : Blockly.utils.toolbox.ToolboxInfo {
 
         return {
-            "kind": "flyoutToolbox",
-            "contents": [
+            kind: "categoryToolbox",
+            contents: [
                 {
-                    kind: "block",
-                    type: "start"
+                    kind: "category",
+                    name: "Zaciatky",
+                    colour: "#E2CA2D",
+                    contents: [
+                        {
+                            kind: "block",
+                            type: "start"
+                        },
+
+                        {
+                            kind: "block",
+                            type: "start_clicked"
+                        },
+
+                        {
+                            kind: "block",
+                            type: "start_key_pressed"
+                        },
+                    ]
                 },
 
                 {
-                    kind: "block",
-                    type: "start_clicked"
-                },
-
-                {
-                    kind: "block",
-                    type: "start_key_pressed"
-                },
-
-                {
-                    kind: "block",
-                    type: "move_forward",
-                    inputs: {
-                        STEPS: {
-                            block: {
-                                type: "math_number",
-                                fields: { NUM: 0 }
+                    kind: "category",
+                    name: "Pohyb",
+                    colour: "#ff00aa",
+                    contents: [
+                        {
+                            kind: "block",
+                            type: "move_forward",
+                            inputs: {
+                                STEPS: {
+                                    block: {
+                                        type: "math_number",
+                                        fields: { NUM: 0 }
+                                    }
+                                }
                             }
-                        }
-                    }
-                },
+                        },
 
-                {
-                    kind: "block",
-                    type: "math_number"
-                },
-
-                {
-                    kind: "block",
-                    type: "always_true"
-                },
-
-                {
-                    kind: "block",
-                    type: "always_false"
-                },
-
-                {
-                    kind: "block",
-                    type: "turn_left",
-                    inputs: {
-                        DEGREES: {
-                            block: {
-                                type: "math_number",
-                                fields: { NUM: 0 }
+                        {
+                            kind: "block",
+                            type: "turn_left",
+                            inputs: {
+                                DEGREES: {
+                                    block: {
+                                        type: "math_number",
+                                        fields: { NUM: 0 }
+                                    }
+                                }
                             }
-                        }
-                    }
-                },
+                        },
 
-                {
-                    kind: "block",
-                    type: "turn_right",
-                    inputs: {
-                        DEGREES: {
-                            block: {
-                                type: "math_number",
-                                fields: { NUM: 0 }
+                        {
+                            kind: "block",
+                            type: "turn_right",
+                            inputs: {
+                                DEGREES: {
+                                    block: {
+                                        type: "math_number",
+                                        fields: { NUM: 0 }
+                                    }
+                                }
                             }
+                        },
+
+                        {
+                            kind: "block",
+                            type: "set_rotation"
+                        },
+
+                        {
+                            kind: "block",
+                            type: "jump_to_xy",
+                            inputs: {
+                                X: { block: { type: "math_number", fields: { NUM: 0 } } },
+                                Y: { block: { type: "math_number", fields: { NUM: 0 } } }
+                            }
+                        },
+
+                        {
+                            kind: "block",
+                            type: "glide_to_xy",
+                            inputs: {
+                                X: { block: { type: "math_number", fields: { NUM: 0 } } },
+                                Y: { block: { type: "math_number", fields: { NUM: 0 } } },
+                                TIME: { block: { type: "math_number", fields: { NUM: 0 } } }
+                            }
+                        },
+
+                        {
+                            kind: "block",
+                            type: "jump_to_mouse_select"
+                        },
+
+                        {
+                            kind: "block",
+                            type: "glide_to_mouse_select",
+                            inputs: {
+                                TIME: { block: { type: "math_number", fields: { NUM: 0 } } }
+                            }
+                        },
+
+                        {
+                            kind: "block",
+                            type: "set_bounce"
                         }
-                    }
+                    ]
                 },
 
                 {
-                    kind: "block",
-                    type: "set_rotation"
+                    kind: "category",
+                    name: "Kontrola",
+                    colour: "#ff0055",
+                    contents: [
+                        {
+                            kind: "block",
+                            type: "wait",
+                            inputs: {
+                                TIME: {block: { type: "math_number", fields: { NUM: 0 } } },
+                            }
+                        },
+
+                        {
+                            kind: "block",
+                            type: "repeat",
+                            inputs: {
+                                TIMES: {block: { type: "math_number", fields: { NUM: 0 } } },
+                            }
+                        },
+
+                        {
+                            kind: "block",
+                            type: "while"
+                        },
+
+                        {
+                            kind: "block",
+                            type: "if"
+                        },
+
+                        {
+                            kind: "block",
+                            type: "if_else"
+                        }
+                    ]
                 },
 
                 {
-                    kind: "block",
-                    type: "jump_to_xy",
-                    inputs: {
-                        X: { block: { type: "math_number", fields: { NUM: 0 } } },
-                        Y: { block: { type: "math_number", fields: { NUM: 0 } } }
-                    }
+                    kind: "category",
+                    name: "Vyzaz",
+                    colour: "#ff00ff",
+                    contents: [
+                        {
+                            kind: "block",
+                            type: "next_costume"
+                        },
+
+                        {
+                            kind: "block",
+                            type: "hide",
+                        },
+
+                        {
+                            kind: "block",
+                            type: "show",
+                        },
+
+                        {
+                            kind: "block",
+                            type: "set_costume"
+                        }
+                    ]
                 },
 
                 {
-                    kind: "block",
-                    type: "glide_to_xy",
-                    inputs: {
-                        X: { block: { type: "math_number", fields: { NUM: 0 } } },
-                        Y: { block: { type: "math_number", fields: { NUM: 0 } } },
-                        TIME: { block: { type: "math_number", fields: { NUM: 0 } } }
-                    }
-                },
+                    kind: "category",
+                    name: "Typy",
+                    colour: "#0080ff",
+                    contents: [
+                        {
+                            kind: "block",
+                            type: "math_number"
+                        },
 
+                        {
+                            kind: "block",
+                            type: "always_true"
+                        },
 
-                {
-                    kind: "block",
-                    type: "next_costume"
-                },
-
-                {
-                    kind: "block",
-                    type: "hide",
-                },
-
-                {
-                    kind: "block",
-                    type: "show",
-                },
-
-                {
-                    kind: "block",
-                    type: "wait",
-                    inputs: {
-                        TIME: {block: { type: "math_number", fields: { NUM: 0 } } },
-                    }
-                },
-
-                {
-                    kind: "block",
-                    type: "repeat",
-                    inputs: {
-                        TIMES: {block: { type: "math_number", fields: { NUM: 0 } } },
-                    }
-                },
-
-                {
-                    kind: "block",
-                    type: "while"
-                },
-
-                {
-                    kind: "block",
-                    type: "jump_to_mouse_select"
-                },
-
-                {
-                    kind: "block",
-                    type: "glide_to_mouse_select",
-                    inputs: {
-                        TIME: { block: { type: "math_number", fields: { NUM: 0 } } }
-                    }
-                },
-
-                {
-                    kind: "block",
-                    type: "set_costume"
-                },
-
-                {
-                    kind: "block",
-                    type: "set_bounce"
-                },
-
-                {
-                    kind: "block",
-                    type: "if"
-                },
-
-                {
-                    kind: "block",
-                    type: "if_else"
+                        {
+                            kind: "block",
+                            type: "always_false"
+                        }
+                    ]
                 }
-
             ]
         };
 
