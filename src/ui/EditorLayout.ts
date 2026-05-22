@@ -112,6 +112,7 @@ export class EditorLayout {
         return button;
     }
 
+    //@TODO new buttons
     private setupToolbar() {
 
         //duplicate
@@ -342,6 +343,7 @@ export class EditorLayout {
     }
 
     private async runSingleSpriteEvent(sprite: Sprite, starterType: string, eventData?: any) {
+        if (this.activeTool !== EditorTool.RUNNING) return;
         if (!this.executionController) return;
         const environment = this.createExecutionEnvironment();
         await runProgram(sprite, this.executionController, starterType, eventData, environment);
@@ -371,7 +373,7 @@ export class EditorLayout {
             background: this.renderer.getBackground()
         };
 
-        //@TODO give saves images
+        //@TODO give saves images, very optional
         const json = JSON.stringify(project, null, 2);
         const blob = new Blob([json], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -430,14 +432,19 @@ export class EditorLayout {
             this.executionController.stop();
         }
 
-        if (!this.preExecutionProject) {
-            return;
+        if (this.preExecutionProject) {
+            await this.loadProjectData(this.preExecutionProject);
+            this.preExecutionProject = null;
         }
 
-        await this.loadProjectData(this.preExecutionProject);
-
-        this.preExecutionProject = null;
         this.executionController = null;
+
+        this.activeTool = EditorTool.SELECT;
+
+        this.setBlocklyLocked(false);
+        this.setToolbarLocked(false);
+        this.updateToolbarStyles();
+        this.updateInspectorVisibility();
     }
 
     private saveCurrentProgram() {
@@ -455,16 +462,21 @@ export class EditorLayout {
         });
     }
 
-    //@TODO fix selection box
     private async runPrograms() {
         if (this.executionController && !this.executionController.isStopped) {
             return;
         }
 
+        this.saveCurrentProgram();
+
+        this.runtime.clearSelection();
+        this.inspector.showSprite(null);
+        this.renderer.setSelectedSprite(null);
+        this.currentProgramSprite = null;
+
         this.preExecutionProject = this.createProjectSnapshot();
         this.executionController = new ExecutionController();
 
-        const previousTool = this.activeTool;
         this.activeTool = EditorTool.RUNNING;
         this.setBlocklyLocked(true);
         this.setToolbarLocked(true);
@@ -476,19 +488,18 @@ export class EditorLayout {
         try {
             const environment = this.createExecutionEnvironment();
             const promises = this.runtime.getAllSprites().map(sprite =>
-                runProgram(sprite, this.executionController!, "start", undefined, environment)
+                runProgram(
+                    sprite,
+                    this.executionController!,
+                    "start",
+                    undefined,
+                    environment
+                )
             );
 
             await Promise.all(promises);
-        } catch (error) {
-            //stopped
-        } finally {
-            this.executionController = null;
-            this.activeTool = previousTool;
-            this.setBlocklyLocked(false);
-            this.setToolbarLocked(false);
-            this.updateToolbarStyles();
-            this.updateInspectorVisibility();
+        } catch {
+            // stopped
         }
     }
 
