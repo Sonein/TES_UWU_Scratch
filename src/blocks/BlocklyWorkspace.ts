@@ -18,7 +18,6 @@ export class BlocklyWorkspace {
         Blockly.svgResize(this.workspace);
     }
 
-    //@TODO make categories
     private createToolbox() : Blockly.utils.toolbox.ToolboxInfo {
 
         return {

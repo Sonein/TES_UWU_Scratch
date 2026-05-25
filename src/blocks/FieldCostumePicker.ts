@@ -1,7 +1,6 @@
 import * as Blockly from "blockly";
 import { Sprite } from "../core/Sprite";
 
-//@TODO buttons
 export class FieldCostumePicker extends Blockly.Field {
     SERIALIZABLE = true;
 
@@ -56,7 +55,24 @@ export class FieldCostumePicker extends Blockly.Field {
         title.textContent = `Select costume for ${sprite.data.name}`;
 
         const closeBtn = document.createElement("button");
-        closeBtn.textContent = "Close";
+        closeBtn.type = "button";
+
+        closeBtn.style.width = "40px";
+        closeBtn.style.height = "40px";
+        closeBtn.style.padding = "0";
+        closeBtn.style.border = "none";
+        closeBtn.style.background = "transparent";
+        closeBtn.style.cursor = "pointer";
+
+        const closeImg = document.createElement("img");
+        closeImg.src = "/assets/close/close.gif"; //path
+        closeImg.width = 40;
+        closeImg.height = 40;
+        closeImg.draggable = false;
+        closeImg.style.pointerEvents = "none";
+
+        closeBtn.appendChild(closeImg);
+
         closeBtn.onclick = () => modal.remove();
 
         modal.append(title, closeBtn);
