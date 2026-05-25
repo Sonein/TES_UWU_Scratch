@@ -14,6 +14,19 @@ import { FieldCostumePicker } from "../blocks/FieldCostumePicker";
 import { FieldSpriteDropdown } from "../blocks/FieldSpriteDropdown";
 import type {ExecutionEnvironment} from "../blocks/blockExecution.ts";
 
+type ToolbarImageSet = {
+    normal: string;
+    active?: string;
+    disabled?: string;
+};
+
+type ToolbarImageButton = {
+    button: HTMLButtonElement;
+    img: HTMLImageElement;
+    images: ToolbarImageSet;
+    tool?: EditorTool;
+};
+
 export class EditorLayout {
 
     toolbar: HTMLElement;
@@ -29,6 +42,7 @@ export class EditorLayout {
     private activeTool: EditorTool = EditorTool.SELECT;
     private toolButtons: Map<EditorTool, HTMLButtonElement> = new Map();
     private toolbarActionButtons: HTMLButtonElement[] = [];
+    private toolbarImageButtons: ToolbarImageButton[] = [];
     private runButton!: HTMLButtonElement;
     private stopButton!: HTMLButtonElement;
     private currentProgramSprite: Sprite | null = null;
@@ -112,69 +126,152 @@ export class EditorLayout {
         return button;
     }
 
-    //@TODO new buttons
+    private createToolbarImageButton(
+        images: ToolbarImageSet,
+        onClick: () => void,
+        tool?: EditorTool
+    ): HTMLButtonElement {
+        const button = document.createElement("button");
+        button.type = "button";
+
+        button.style.height = "60px";
+        button.style.width = "60px";
+        button.style.padding = "0";
+        button.style.border = "none";
+        button.style.background = "transparent";
+        button.style.cursor = "pointer";
+
+        const img = document.createElement("img");
+        img.src = images.normal;
+        img.width = 60;
+        img.height = 60;
+        img.draggable = false;
+        img.style.pointerEvents = "none";
+
+        button.appendChild(img);
+        button.onclick = onClick;
+
+        this.toolbarImageButtons.push({
+            button,
+            img,
+            images,
+            tool
+        });
+
+        return button;
+    }
+
     private setupToolbar() {
 
         //duplicate
-        const dupeBtn = this.registerToolbarButton(document.createElement("button"));
-        dupeBtn.textContent = "Duplicate";
-        dupeBtn.onclick = () => {
-            this.setActiveTool(EditorTool.DUPLICATE);
-        };
+        const dupeBtn = this.registerToolbarButton(
+            this.createToolbarImageButton(
+                {
+                    normal: "/assets/dupe/dupe.gif",
+                    active: "/assets/dupe/dupe1.png",
+                    disabled: "/assets/dupe/dupeb.png"
+                },
+                () => this.setActiveTool(EditorTool.DUPLICATE),
+                EditorTool.DUPLICATE
+            )
+        );
         this.toolbar.appendChild(dupeBtn);
         this.toolButtons.set(EditorTool.DUPLICATE, dupeBtn);
 
         //delete
-        const delBtn = this.registerToolbarButton(document.createElement("button"));
-        delBtn.textContent = "Delete";
-        delBtn.onclick = () => {
-            this.setActiveTool(EditorTool.DELETE);
-        };
+        const delBtn = this.registerToolbarButton(this.createToolbarImageButton(
+            {
+                normal: "/assets/del/delete.gif",
+                active: "/assets/del/delete1.png",
+                disabled: "/assets/del/deleteb.png"
+            },
+            () => {
+                this.setActiveTool(EditorTool.DELETE);
+            },
+            EditorTool.DELETE
+        ));
         this.toolbar.appendChild(delBtn);
         this.toolButtons.set(EditorTool.DELETE, delBtn);
 
         //import
-        const importBtn = this.registerToolbarButton(document.createElement("button"));
-        importBtn.textContent = "Import Sprite";
-        importBtn.onclick = () => this.importSprite()
+        const importBtn = this.registerToolbarButton(this.createToolbarImageButton(
+            {
+                normal: "/assets/is/is.gif",
+                active: "/assets/is/is1.png",
+                disabled: "/assets/is/isb.png"
+            },
+            () => this.importSprite()
+        ));
         this.toolbar.appendChild(importBtn);
 
         //bg
-        const bgBtn = this.registerToolbarButton(document.createElement("button"));
-        bgBtn.textContent = "Background";
-        bgBtn.onclick = () => this.changeBackground();
+        const bgBtn = this.registerToolbarButton(this.createToolbarImageButton(
+            {
+                normal: "/assets/ib/ib.gif",
+                active: "/assets/ib/ib1.png",
+                disabled: "/assets/ib/ibb.png"
+            },
+            () => this.changeBackground()
+        ));
         this.toolbar.appendChild(bgBtn);
 
         //save
-        const saveBtn = this.registerToolbarButton(document.createElement("button"));
-        saveBtn.textContent = "Save";
-        saveBtn.onclick = () => this.saveProject();
+        const saveBtn = this.registerToolbarButton(this.createToolbarImageButton(
+            {
+                normal: "/assets/save/save.gif",
+                active: "/assets/save/save1.png",
+                disabled: "/assets/save/saveb.png"
+            },
+            () => this.saveProject()
+        ));
         this.toolbar.appendChild(saveBtn);
 
         //load
-        const loadBtn = this.registerToolbarButton(document.createElement("button"));
-        loadBtn.textContent = "Load";
-        loadBtn.onclick = () => this.loadProject();
+        const loadBtn = this.registerToolbarButton(this.createToolbarImageButton(
+            {
+                normal: "/assets/load/load.gif",
+                active: "/assets/load/load1.png",
+                disabled: "/assets/load/loadb.png"
+            },
+            () => this.loadProject()
+        ));
         this.toolbar.appendChild(loadBtn);
 
         //clear trash
-        const clearTrashBtn = this.registerToolbarButton(document.createElement("button"));
-        clearTrashBtn.textContent = "Empty Trash";
-        clearTrashBtn.onclick = () => this.clearTrashcan();
+        const clearTrashBtn = this.registerToolbarButton(this.createToolbarImageButton(
+            {
+                normal: "/assets/trash/trash.gif",
+                active: "/assets/trash/trash1.png",
+                disabled: "/assets/trash/trashb.png"
+            },
+            () => this.clearTrashcan()
+        ));
         this.toolbar.appendChild(clearTrashBtn);
 
         //run
-        this.runButton = document.createElement("button");
-        this.runButton.textContent = "Run";
-        this.runButton.onclick = () => this.runPrograms();
+        this.runButton = this.createToolbarImageButton(
+            {
+                normal: "/assets/run/run.gif",
+                active: "/assets/run/run1.png",
+                disabled: "/assets/run/runb.png"
+            },
+            () => this.runPrograms()
+        );
         this.toolbar.appendChild(this.runButton);
 
         //stop
-        this.stopButton = document.createElement("button");
-        this.stopButton.textContent = "Stop";
-        this.stopButton.onclick = () => this.stopPrograms();
+        this.stopButton = this.createToolbarImageButton(
+            {
+                normal: "/assets/stop/stop.gif",
+                active: "/assets/stop/stop1.png",
+                disabled: "/assets/stop/stopb.png"
+            },
+            () => this.stopPrograms()
+        );
         this.stopButton.disabled = true;
         this.toolbar.appendChild(this.stopButton);
+
+        this.updateToolbarButtonImages();
     }
 
     private async onSpriteClicked(sprite: Sprite) {
@@ -301,18 +398,28 @@ export class EditorLayout {
         input.click();
     }
 
-    private updateToolbarStyles() {
+    private updateToolbarButtonImages() {
+        for (const entry of this.toolbarImageButtons) {
+            const { button, img, images, tool } = entry;
 
-        for (const [tool, button] of this.toolButtons) {
-
-            if (tool === this.activeTool) {
-                button.style.background = "#ff9bb5";
+            if (button.disabled && images.disabled) {
+                img.src = images.disabled;
+            } else if (tool && this.activeTool === tool && images.active) {
+                img.src = images.active;
             } else {
-                button.style.background = "";
+                img.src = images.normal;
             }
 
+            button.style.cursor = button.disabled ? "not-allowed" : "pointer";
+        }
+    }
+
+    private updateToolbarStyles() {
+        for (const [, button] of this.toolButtons) {
+            button.style.background = "transparent";
         }
 
+        this.updateToolbarButtonImages();
     }
 
     private updateInspectorVisibility() {
@@ -340,6 +447,8 @@ export class EditorLayout {
         if (this.stopButton) {
             this.stopButton.disabled = !locked;
         }
+
+        this.updateToolbarButtonImages();
     }
 
     private async runSingleSpriteEvent(sprite: Sprite, starterType: string, eventData?: any) {
