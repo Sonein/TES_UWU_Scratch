@@ -7,6 +7,10 @@ export class SpriteInspector {
 
     constructor(container: HTMLElement) {
         this.container = container;
+        this.container.style.display = "flex";
+        this.container.style.alignItems = "center";
+        this.container.style.gap = "8px";
+        this.container.style.marginBottom = "6px";
     }
 
     showSprite(sprite: Sprite | null): void {
@@ -44,15 +48,31 @@ export class SpriteInspector {
         visible.checked = data.visible;
 
         const costumeInput = document.createElement("button");
-        costumeInput.textContent = "Edit Costumes";
+        costumeInput.type = "button";
 
-        this.container.append("Name:", name);
+        costumeInput.style.height = "60px";
+        costumeInput.style.width = "60px";
+        costumeInput.style.padding = "0"
+        costumeInput.style.border = "none";
+        costumeInput.style.background = "transparent";
+        costumeInput.style.cursor = "pointer";
+
+        const costumeImg = document.createElement("img");
+        costumeImg.src = "/assets/costadd/ca.gif";
+        costumeImg.width = 60;
+        costumeImg.height = 60;
+        costumeImg.draggable = false;
+        costumeImg.style.pointerEvents = "none";
+
+        costumeInput.appendChild(costumeImg);
+
+        this.container.append("Meno:", name);
         this.container.append("X:", x);
         this.container.append("Y:", y);
-        this.container.append("Rotation:", rotation);
-        this.container.append("Scale:", scale);
-        this.container.append("Visible:", visible);
-        this.container.append("Costumes:", costumeInput)
+        this.container.append("Rotacia:", rotation);
+        this.container.append("Velkost:", scale);
+        this.container.append("Vididtelnost:", visible);
+        this.container.append("Vyzory:", costumeInput)
 
         name.oninput = () => data.name = name.value;
         x.oninput = () => data.x = Number(x.value);
