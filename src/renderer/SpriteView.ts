@@ -11,7 +11,8 @@ export class SpriteView {
     canDrag?: () => boolean;
 
     private dragging = false;
-    private lastCostumeIndex = -1
+    private lastCostumeIndex = -1;
+    private lastCostumeImage: string | null = null;
     private outline!: PIXI.Graphics;
     private isSelected = false;
 
@@ -26,6 +27,10 @@ export class SpriteView {
         this.pixiSprite.cursor = "pointer";
         this.outline = new PIXI.Graphics();
         this.outline.visible = false;
+        this.pixiSprite.pivot.set(
+            texture.width / 2,
+            texture.height / 2
+        );
         /*this.outline.filters = [
             new GlowFilter({ distance: 15, outerStrength: 2 }),
             ];*/
@@ -70,9 +75,13 @@ export class SpriteView {
         this.pixiSprite.rotation = data.rotation * (Math.PI / 180);
         this.pixiSprite.visible = data.visible;
 
-        if (this.lastCostumeIndex !== data.currentCostume) {
+        const costume = data.costumes[data.currentCostume];
+        if (
+            this.lastCostumeIndex !== data.currentCostume ||
+            this.lastCostumeImage !== costume.image
+        ) {
             this.lastCostumeIndex = data.currentCostume;
-            const costume = data.costumes[data.currentCostume];
+            this.lastCostumeImage = costume.image;
 
             PIXI.Assets.load(costume.image).then(texture => {
                 this.pixiSprite.texture = texture;
@@ -81,6 +90,10 @@ export class SpriteView {
                     texture.width / 2,
                     texture.height / 2
                 );
+
+                if (this.isSelected) {
+                    this.drawOutline();
+                }
             });
         }
 
