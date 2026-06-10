@@ -2,14 +2,14 @@
 
   /* color palette */
   --pink-bg: #f6b6c6;
-  --pink-panel: #ffd6df;
+  --pink-panel: rgba(255, 214, 223, 0.5);
   --pink-border: #c86b8b;
 
 }
 
 body {
   margin: 0;
-  background: var(--pink-bg);
+  background-image: url("../public/assets/bg.png");
   font-family: sans-serif;
   height: 100vh;
 }
@@ -19,8 +19,8 @@ body {
 
   display: grid;
 
-  grid-template-columns: 40fr 60fr;
-  grid-template-rows: 70px 70px 1fr;
+  grid-template-columns: 35fr 65fr;
+  grid-template-rows: 90px 90px 1fr;
 
   grid-template-areas:
     "toolbar toolbar"
