@@ -7,15 +7,15 @@ export class SpriteInspector {
 
     constructor(container: HTMLElement) {
         this.container = container;
-        this.container.style.display = "flex";
-        this.container.style.alignItems = "center";
-        this.container.style.gap = "8px";
-        this.container.style.marginBottom = "6px";
     }
 
     showSprite(sprite: Sprite | null): void {
         this.sprite = sprite;
         this.container.innerHTML = "";
+        this.container.style.display = "flex";
+        this.container.style.alignItems = "center";
+        this.container.style.gap = "8px";
+        this.container.style.marginBottom = "6px";
 
         if (!sprite) {
             return
