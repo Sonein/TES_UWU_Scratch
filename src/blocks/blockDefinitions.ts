@@ -266,7 +266,7 @@ export function registerBlocks() {
     Blockly.Blocks["set_costume"] = {
         init: function () {
             this.appendDummyInput()
-                .appendField("set costume")
+                .appendField("Nastav costume")
                 .appendField(new FieldCostumePicker("0"), "COSTUME");
 
             this.setPreviousStatement(true);

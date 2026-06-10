@@ -25,7 +25,7 @@ export class BlocklyWorkspace {
             contents: [
                 {
                     kind: "category",
-                    name: "Zaciatky",
+                    name: "Start",
                     colour: "#E2CA2D",
                     contents: [
                         {
@@ -173,7 +173,7 @@ export class BlocklyWorkspace {
 
                 {
                     kind: "category",
-                    name: "Vyzaz",
+                    name: "Vyzor",
                     colour: "#ff00ff",
                     contents: [
                         {
