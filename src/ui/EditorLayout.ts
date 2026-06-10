@@ -424,7 +424,7 @@ export class EditorLayout {
 
     private updateInspectorVisibility() {
         if (this.activeTool === EditorTool.SELECT) {
-            this.inspector.container.style.display = "block";
+            this.inspector.container.style.display = "flex";
         } else {
             this.inspector.container.style.display = "none";
         }
