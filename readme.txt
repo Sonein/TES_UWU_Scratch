@@ -9,3 +9,5 @@ periodically use "npm audit fix" in case u are prompted to do so
 "npm install @blockly/field-angle"
 "npm run dev"
 now simply open http://localhost:5173/ in your browser of choice
+
+You can use run.bat, if you are on Windows.
