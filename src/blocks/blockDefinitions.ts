@@ -34,6 +34,21 @@ export function registerBlocks() {
         }
     };
 
+    Blockly.Blocks["move_right"] = {
+        init: function () {
+            this.appendValueInput("STEPS")
+                .setCheck("Number")
+                .appendField("Doboku!");
+
+            this.appendDummyInput()
+                .appendField("... o pixely");
+
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setColour(320);
+        }
+    };
+
     Blockly.Blocks["turn_left"] = {
         init: function () {
             this.appendValueInput("DEGREES")
