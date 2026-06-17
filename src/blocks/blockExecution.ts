@@ -81,6 +81,22 @@ async function executeBlock(block: Blockly.Block, sprite: Sprite, controller: Ex
             break;
         }
 
+        case "move_right": {
+            const steps = getNumberInput(block, "STEPS");
+
+            const radians = normalizeAngle(sprite.data.rotation) * Math.PI / 180;
+
+            const dx = Math.cos(radians) * steps;
+            const dy = Math.sin(radians) * steps;
+
+            sprite.setPosition(
+                sprite.data.x + dx,
+                sprite.data.y + dy
+            );
+
+            break;
+        }
+
         case "turn_left": {
             const degrees = normalizeAngle(getNumberInput(block, "DEGREES"));
 

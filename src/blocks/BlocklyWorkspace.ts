@@ -65,6 +65,19 @@ export class BlocklyWorkspace {
 
                         {
                             kind: "block",
+                            type: "move_right",
+                            inputs: {
+                                STEPS: {
+                                    block: {
+                                        type: "math_number",
+                                        fields: { NUM: 0 }
+                                    }
+                                }
+                            }
+                        },
+
+                        {
+                            kind: "block",
                             type: "turn_left",
                             inputs: {
                                 DEGREES: {
@@ -233,5 +246,8 @@ export class BlocklyWorkspace {
         if (!data) return;
         Blockly.serialization.workspaces.load(data, this.workspace);
 
+        const trash = this.workspace.trashcan;
+        if (!trash) return;
+        trash.emptyContents();
     }
 }
