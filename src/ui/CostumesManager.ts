@@ -84,6 +84,11 @@ export class CostumesManager {
         this.container.append(title, closeBtn, addBtn);
 
         const list = document.createElement("div");
+        list.style.display = "grid";
+        list.style.gridTemplateColumns = "repeat(auto-fill, 100px)";
+        list.style.gap = "10px";
+        list.style.marginTop = "12px";
+        list.style.minWidth = "320px";
 
         sprite.data.costumes.forEach((costume,index) => {
 

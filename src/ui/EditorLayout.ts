@@ -286,6 +286,8 @@ export class EditorLayout {
         }
 
         if (this.activeTool === EditorTool.DUPLICATE) {
+            this.saveCurrentProgram();
+
             const data = sprite.data;
 
             const newSprite = this.runtime.addSprite({
@@ -615,7 +617,7 @@ export class EditorLayout {
     private clearTrashcan() {
         const trash = this.blockly.workspace.trashcan;
         if (!trash) return;
-        trash.emptyContents()
+        trash.emptyContents();
     }
 
     private createExecutionEnvironment(): ExecutionEnvironment {
